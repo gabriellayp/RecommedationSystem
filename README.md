@@ -1,4 +1,9 @@
 # 🎬 Film Recommendation System
+COHORT ID : MC008D5X2466
+
+Nama : Gabriella Yoanda Pelawi
+
+Email : mc008d5x2466@student.devacademy.id
 
 ## 1. 📌 Project Overview
 
