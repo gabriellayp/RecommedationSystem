@@ -45,9 +45,13 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 | `rating`    | Nilai rating dari pengguna terhadap film      |
 
 ### 📊 Exploratory Data Analysis
-- Genre paling umum: Drama, Comedy, Action.
-- Sebagian besar film hanya dirating oleh segelintir pengguna.
-- Distribusi rating umumnya terpusat di angka 3–4.
+1. 🎬 Distribusi Genre Film
+   ![Distribusi Genre](./images/Genrefilm.png)
+   Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
+
+2. ⭐ Distribusi Rating Film
+  ![Distribusi Rating](./images/ratingfilm.png)
+Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan. Ini bisa menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
 
@@ -132,29 +136,38 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 Kami menggunakan **Root Mean Squared Error (RMSE)** untuk collaborative filtering model.
 
 #### Formula:
-\[
-RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
-\]
-
+RMSE = √(1/n * Σ(yᵢ - ŷᵢ)²)
 - RMSE rendah berarti prediksi model mendekati nilai sebenarnya.
 
-### 📊 Hasil
-- **Training RMSE:** ~0.21
-- **Validation RMSE:** ~0.23  
-(Metrik ini berada dalam kisaran akurat untuk skala rating 0–1)
-
+### 📉 Evaluasi Performa Model Collaborative Filtering
+![Metrik Model](./images/modelmetrics.png)
+Visualisasi di atas menunjukkan performa model Collaborative Filtering berbasis Neural Network yang dievaluasi menggunakan metrik Root Mean Squared Error (RMSE).
+- Grafik menunjukkan tren penurunan nilai RMSE pada data pelatihan seiring bertambahnya epoch, yang berarti model semakin baik dalam memprediksi rating pengguna terhadap film seiring proses pelatihan.
+- Untuk data pengujian, RMSE juga menurun secara konsisten sampai sekitar epoch ke-4, kemudian mulai menunjukkan fluktuasi kecil. Hal ini menandakan bahwa model berhasil belajar dengan baik tanpa overfitting secara signifikan.
+- Nilai RMSE test yang tetap rendah mengindikasikan bahwa model memiliki generalisasi yang baik dalam merekomendasikan film kepada pengguna berdasarkan interaksi sebelumnya.
 ---
 
 ## ✅ Kesimpulan
 
-Kami berhasil membangun sistem rekomendasi film dengan dua pendekatan berbeda:
-- **Content-based filtering** menghasilkan saran film berdasarkan genre yang mirip.
-- **Collaborative filtering** memanfaatkan rating historis pengguna dan mampu memprediksi preferensi secara lebih personal.
+Proyek ini berhasil membangun sistem rekomendasi film yang efektif dengan mengimplementasikan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering berbasis Deep Learning.
+
+Dari sisi Content-Based Filtering, sistem mampu memberikan rekomendasi film yang serupa berdasarkan kesamaan genre. Ini berguna untuk pengguna baru (cold start) yang belum memiliki riwayat interaksi. Pendekatan ini memanfaatkan teknik TF-IDF Vectorization dan Cosine Similarity untuk mengukur kemiripan antar film. Hasilnya menunjukkan bahwa sistem dapat merekomendasikan film-film dengan genre yang sangat relevan terhadap film yang disukai pengguna.
+
+Sementara itu, pendekatan Collaborative Filtering menggunakan embedding model neural network untuk mempelajari hubungan kompleks antara pengguna dan film berdasarkan data rating historis. Model ini menunjukkan performa yang baik dalam memprediksi preferensi pengguna secara personal, terbukti dari nilai RMSE yang rendah dan stabil pada data uji. Dengan arsitektur deep learning yang sederhana namun efektif (user/movie embedding, dense layers, dan dropout), sistem mampu menggeneralisasi dengan baik tanpa overfitting.
+
+Dari perspektif bisnis, sistem ini menjawab dua pertanyaan utama:
+
+- Bagaimana memberikan rekomendasi yang akurat untuk pengguna baru maupun lama?
+
+- Bagaimana memanfaatkan data historis untuk meningkatkan personalisasi?
+
+Dengan meningkatnya kualitas rekomendasi, sistem ini berpotensi meningkatkan user engagement, retensi pengguna, dan kepuasan dalam menjelajahi konten film, yang merupakan aspek krusial dalam platform hiburan digital seperti Netflix dan sejenisnya.
+
+Secara keseluruhan, proyek ini membuktikan bahwa kombinasi pendekatan berbasis konten dan kolaboratif dapat menghasilkan sistem rekomendasi yang lebih komprehensif, akurat, dan relevan, serta memiliki dampak langsung terhadap pengalaman pengguna dan nilai bisnis platform.
 
 ---
 
 ## 📚 Resources
-- MovieLens Dataset: [https://grouplens.org/datasets/movielens](https://grouplens.org/datasets/movielens)
 - TensorFlow Docs: [https://www.tensorflow.org/](https://www.tensorflow.org/)
 - Scikit-learn Docs: [https://scikit-learn.org/](https://scikit-learn.org/)
 
