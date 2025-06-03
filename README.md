@@ -52,11 +52,11 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 
 ### 📊 Exploratory Data Analysis
 **1. Distribusi Genre Film 🎬**
-   ![Distribusi Genre](./images/Genrefilm.png)
+   ![Distribusi Genre](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/Genrefilm.png?raw=true)
    Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
 
 **2. Distribusi Rating Film ⭐**
-  ![Distribusi Rating](./images/ratingfilm.png)
+  ![Distribusi Rating](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/ratingfilm.png?raw=true)
 Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan. Ini bisa menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
@@ -146,7 +146,7 @@ RMSE = √(1/n * Σ(yᵢ - ŷᵢ)²)
 - RMSE rendah berarti prediksi model mendekati nilai sebenarnya.
 
 ### 📉 Evaluasi Performa Model Collaborative Filtering
-![Metrik Model](./images/modelmetrics.png)
+![Metrik Model](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/modelmetrics.png?raw=true)
 Visualisasi di atas menunjukkan performa model Collaborative Filtering berbasis Neural Network yang dievaluasi menggunakan metrik Root Mean Squared Error (RMSE).
 - Grafik menunjukkan tren penurunan nilai RMSE pada data pelatihan seiring bertambahnya epoch, yang berarti model semakin baik dalam memprediksi rating pengguna terhadap film seiring proses pelatihan.
 - Untuk data pengujian, RMSE juga menurun secara konsisten sampai sekitar epoch ke-4, kemudian mulai menunjukkan fluktuasi kecil. Hal ini menandakan bahwa model berhasil belajar dengan baik tanpa overfitting secara signifikan.
