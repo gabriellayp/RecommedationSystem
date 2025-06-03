@@ -1,15 +1,16 @@
 # 🎬 Film Recommendation System
 
-## 📌 Project Overview
+## 1. 📌 Project Overview
 
 Dalam era digital saat ini, industri hiburan semakin bergantung pada sistem rekomendasi untuk meningkatkan keterlibatan pengguna. Netflix mengklaim bahwa lebih dari 80% jam tayang berasal dari sistem rekomendasi mereka, menandakan betapa krusialnya sistem ini dalam pengalaman pengguna. 
+
 Meningkatnya jumlah konten membuat pengguna kesulitan dalam memilih film yang relevan dengan preferensi mereka. Oleh karena itu, proyek ini bertujuan untuk membangun sistem rekomendasi film yang mampu memberikan rekomendasi yang relevan bagi pengguna berdasarkan riwayat interaksi dan kesamaan konten. Proyek ini penting karena mampu meningkatkan user engagement dan pengalaman pengguna dalam menjelajahi film. Oleh karena itu, kemampuan untuk membangun model rekomendasi yang akurat dan relevan dapat berdampak signifikan secara bisnis.
 
 > Referensi:  
 > - [Netflix and the Power of Personalization](https://www.netflixtechblog.com)  
 > - [MovieLens Dataset Overview](https://grouplens.org/datasets/movielens/)
 
-## 💼 Business Understanding
+## 2. 💼 Business Understanding
 
 ### 🎯 Problem Statements
 1. Bagaimana memberikan rekomendasi film kepada pengguna yang menyukai film tertentu?
@@ -26,7 +27,7 @@ Kami mengimplementasikan dua pendekatan sistem rekomendasi:
 
 ---
 
-## 🧠 Data Understanding
+## 3. 🧠 Data Understanding
 
 ### 📦 Dataset
 Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest Datset](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset/data)
@@ -45,17 +46,17 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 | `rating`    | Nilai rating dari pengguna terhadap film      |
 
 ### 📊 Exploratory Data Analysis
-1. 🎬 Distribusi Genre Film
+**1. Distribusi Genre Film 🎬**
    ![Distribusi Genre](./images/Genrefilm.png)
    Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
 
-2. ⭐ Distribusi Rating Film
+**2. Distribusi Rating Film ⭐**
   ![Distribusi Rating](./images/ratingfilm.png)
 Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan. Ini bisa menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
 
-## 🛠️ Data Preparation
+## 4. 🛠️ Data Preparation
 
 ### ✅ Langkah-Langkah
 1. **Pivot Table:** Mengubah data rating ke bentuk matriks (userId x title).
@@ -130,7 +131,7 @@ Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating ya
 
 ---
 
-## 📈 Evaluation
+## 5. 📈 Evaluation
 
 ### 📐 Metrik Evaluasi
 Kami menggunakan **Root Mean Squared Error (RMSE)** untuk collaborative filtering model.
@@ -147,7 +148,7 @@ Visualisasi di atas menunjukkan performa model Collaborative Filtering berbasis 
 - Nilai RMSE test yang tetap rendah mengindikasikan bahwa model memiliki generalisasi yang baik dalam merekomendasikan film kepada pengguna berdasarkan interaksi sebelumnya.
 ---
 
-## ✅ Kesimpulan
+## 6. ✅ Kesimpulan
 
 Proyek ini berhasil membangun sistem rekomendasi film yang efektif dengan mengimplementasikan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering berbasis Deep Learning.
 
