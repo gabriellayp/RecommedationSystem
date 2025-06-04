@@ -139,6 +139,7 @@ Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemirip
 | 4  | Taking of Pelham 1 2 3, The (2009)         | Crime\|Drama\|Thriller   |
 | 5  | Before the Devil Knows You're Dead         | Crime\|Drama\|Thriller   |
 
+Dari hasil rekomendasi di atas, terlihat bahwa rekomendasi film yang mirip dengan dengan Antitrust (2001) merupakan film yang genrenya Crime, Drama dan Thriller.
 
 ### 2️⃣ Collaborative Filtering
 
@@ -214,6 +215,14 @@ Model dikembangkan menggunakan TensorFlow dan Keras, serta memanfaatkan pendekat
 | 8  | Neon Genesis Evangelion: The End of Evangelion (Shin seiki Evangelion Gekijô-ban: Air/Magokoro wo, kimi ni) (1997) | Action\|Animation\|Drama\|Fantasy\|Sci-Fi     |
 | 9  | Man Bites Dog (C'est arrivé près de chez vous) (1992)                                               | Comedy\|Crime\|Drama\|Thriller                 |
 | 10 | Three Billboards Outside Ebbing, Missouri (2017)                                                    | Crime\|Drama                                  |
+
+Dari output diatas, User 269 tampaknya menyukai film dengan genre Drama dan Romance, tetapi juga menikmati variasi genre lain seperti Action, Thriller, dan Animation/Children. Ini memberi gambaran preferensi user yang cukup beragam, dengan kecenderungan kuat pada Drama. Dari hasil rekomendasi diperoleh :
+
+- Mayoritas rekomendasi film ini bergenre Drama, yang konsisten dengan film-film yang user beri rating tinggi.
+
+- Ada juga beberapa film dengan tambahan genre lain seperti War, Crime, Comedy, Romance, Sci-Fi, dan Animation, yang mengindikasikan model mencoba memberi variasi sekaligus tetap relevan dengan preferensi user.
+
+- Rekomendasi ini tampak cocok untuk user karena menyesuaikan genre favoritnya, sekaligus memperkenalkan film-film klasik dan modern yang berpotensi menarik bagi user.
 
 🔚 Dengan pendekatan Collaborative Filtering berbasis deep learning ini, sistem rekomendasi mampu mengidentifikasi pola tersembunyi dari interaksi pengguna, bahkan untuk film yang sebelumnya belum pernah ditonton oleh pengguna yang bersangkutan.
 
