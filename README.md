@@ -54,19 +54,27 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 
 ### 📊 Exploratory Data Analysis
 **1. Jumlah Data Variabel**
+
+Jumlah data pada variabel pada dataset rating.csv yang digunakan dalam analisis sistem rekomendasi ini antara lain :
 | Fitur       | Jumlah                                     |
 |-------------|-----------------------------------------------|
 | `userId`   | 610                                  |
 | `movieId`     | 9724                                    |
 | `rating`    | 100,836  |
 
+Jumlah user adalah 610 dengan total jumlah film sebanyak 9724, dimiliki data rating sebanyak 100,836.
+
 **2. Distribusi Genre Film 🎬**
+
    ![Distribusi Genre](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/Genrefilm.png?raw=true)
+   
    Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
 
 **3. Distribusi Rating Film ⭐**
+
   ![Distribusi Rating](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/ratingfilm.png?raw=true)
-Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan.Hal ini menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
+  
+   Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan.Hal ini menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
 
@@ -231,9 +239,9 @@ Kami menggunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi untu
 
 ### 📉 Evaluasi Performa Model Collaborative Filtering
 
-![RMSE Grafik](attachment/fd563d88-b942-4686-b1bd-abcf294f10a6.png)
+![RMSE Grafik](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/metrikmodel.png?raw=true)
 
-Visualisasi di atas menunjukkan performa model pada data pelatihan dan pengujian selama 10 epoch:
+Visualisasi di atas menunjukkan performa model pada data pelatihan dan pengujian yang berhenti karena early stopping di epoch ke-10:
 
 - **RMSE pada data pelatihan** menurun secara signifikan dari awal hingga sekitar epoch ke-4, lalu stabil di sekitar 0.19. Ini menunjukkan bahwa model mampu belajar representasi rating dengan baik.
 - **RMSE pada data pengujian** juga menurun hingga sekitar epoch ke-4, tetapi kemudian mengalami fluktuasi kecil. Meski begitu, nilainya tetap berada di kisaran rendah (sekitar 0.20), yang menunjukkan performa generalisasi yang cukup baik.
