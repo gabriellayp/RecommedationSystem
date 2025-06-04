@@ -7,9 +7,9 @@ Email : mc008d5x2466@student.devacademy.id
 
 ## 1. 📌 Project Overview
 
-Dalam era digital saat ini, industri hiburan semakin bergantung pada sistem rekomendasi untuk meningkatkan keterlibatan pengguna. Netflix mengklaim bahwa lebih dari 80% jam tayang berasal dari sistem rekomendasi mereka, menandakan betapa krusialnya sistem ini dalam pengalaman pengguna. 
+Dalam era digital saat ini, industri hiburan semakin bergantung pada sistem rekomendasi untuk meningkatkan keterlibatan pengguna. Netflix mengklaim bahwa lebih dari 80% jam tayang berasal dari sistem rekomendasi mereka, menandakan betapa krusialnya sistem ini dalam pengalaman pengguna. Meningkatnya jumlah konten membuat pengguna kesulitan dalam memilih film yang relevan dengan preferensi mereka. 
 
-Meningkatnya jumlah konten membuat pengguna kesulitan dalam memilih film yang relevan dengan preferensi mereka. Oleh karena itu, proyek ini bertujuan untuk membangun sistem rekomendasi film yang mampu memberikan rekomendasi yang relevan bagi pengguna berdasarkan riwayat interaksi dan kesamaan konten. Proyek ini penting karena mampu meningkatkan user engagement dan pengalaman pengguna dalam menjelajahi film. Oleh karena itu, kemampuan untuk membangun model rekomendasi yang akurat dan relevan dapat berdampak signifikan secara bisnis.
+Oleh karena itu, proyek ini bertujuan untuk membangun sistem rekomendasi film yang mampu memberikan rekomendasi yang relevan bagi pengguna berdasarkan riwayat interaksi dan kesamaan konten. Proyek ini penting karena mampu meningkatkan user engagement dan pengalaman pengguna dalam menjelajahi film. Oleh karena itu, kemampuan untuk membangun model rekomendasi yang akurat dan relevan dapat berdampak signifikan secara bisnis.
 
 > Referensi:  
 > - [Netflix and the Power of Personalization](https://www.netflixtechblog.com)  
@@ -36,10 +36,10 @@ Kami mengimplementasikan dua pendekatan sistem rekomendasi:
 ## 3. 🧠 Data Understanding
 
 ### 📦 Dataset
-Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest Datset](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset/data)
+Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest Dataset](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset/data)
 
 ### 🔢 Jumlah & Struktur Data
-- **movies.csv:** 9,708 data film, dengan kolom `movieId`, `title`, dan `genres`.
+- **movies.csv:** 9,724 data film, dengan kolom `movieId`, `title`, dan `genres`.
 - **ratings.csv:** 100,836 data rating oleh pengguna, dengan kolom `userId`, `movieId`, `rating`, dan `timestamp`.
 
 ### 🔍 Fitur
@@ -55,7 +55,7 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 ### 📊 Exploratory Data Analysis
 **1. Jumlah Data Variabel**
 
-Jumlah data pada variabel pada dataset rating.csv yang digunakan dalam analisis sistem rekomendasi ini antara lain :
+Jumlah data unique pada variabel yang digunakan dalam analisis sistem rekomendasi ini antara lain :
 | Fitur       | Jumlah                                     |
 |-------------|-----------------------------------------------|
 | `userId`   | 610                                  |
@@ -85,9 +85,9 @@ Jumlah user adalah 610 dengan total jumlah film sebanyak 9724, dimiliki data rat
 2. **Merge Data:** Menggabungkan dataset movies.csv dan ratings.csv berdasarkan kolom movieId untuk mengaitkan setiap film dengan rating  yang diberikan pengguna. Hasil penggabungan ini menghasilkan data frame dengan kolom `userId`, `movieId`, `rating`, `timestamp`, `title`, dan `genres`.
 3. **Pivot Table:** Data diubah menjadi format matriks dengan judul film (`title`) sebagai indeks dan ID pengguna (`userId`) sebagai kolom. 
 4. **Missing Values:** Karena tidak semua pengguna memberi rating pada semua film, maka akan muncul nilai NaN. Nilai tersebut diasumsikan sebagai belum dirating dan diisi dengan 0
-5. **Encoding:** Untuk keperluan pemodelan (terutama embedding), seperti pada Neural Collaborative Filtering (NCF) atau Matrix Factorization, baik `userId` maupun `movieId` perlu diubah menjadi representasi numerik berupa indeks integer mulai dari 0 hingga N-1.
-6. **Filtering:** Data disaring untuk menyertakan hanya film yang memiliki minimal 5 rating dari pengguna berbeda dan Pengguna yang memberikan minimal 5 rating ke film yang berbeda.
+5. **Filtering:** Data disaring untuk menyertakan hanya film yang memiliki minimal 5 rating dari pengguna berbeda dan Pengguna yang memberikan minimal 5 rating ke film yang berbeda.
 Tujuannya adalah menjaga kualitas data agar fokus hanya pada entitas yang aktif dan relevan.
+6. **Encoding:** Untuk keperluan pemodelan (terutama embedding), seperti pada Neural Collaborative Filtering (NCF) atau Matrix Factorization, baik `userId` maupun `movieId` perlu diubah menjadi representasi numerik berupa indeks integer mulai dari 0 hingga N-1.
 
 Note : Fitur timestamp tidak digunakan dalam analisis karena tidak relevan terhadap tujuan pemodelan (content-based recommendation dan colaborative filtering).
 
