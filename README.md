@@ -13,7 +13,8 @@ Meningkatnya jumlah konten membuat pengguna kesulitan dalam memilih film yang re
 
 > Referensi:  
 > - [Netflix and the Power of Personalization](https://www.netflixtechblog.com)  
-> - [MovieLens Dataset Overview](https://grouplens.org/datasets/movielens/)
+
+---
 
 ## 2. 💼 Business Understanding
 
@@ -49,40 +50,79 @@ Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest
 | `genres`    | Genre film dalam format string (dipisah '|')  |
 | `userId`    | ID unik pengguna                              |
 | `rating`    | Nilai rating dari pengguna terhadap film      |
+| `timestamp` | Waktu saat pengguna memberikan rating         |
 
 ### 📊 Exploratory Data Analysis
-**1. Distribusi Genre Film 🎬**
+**1. Jumlah Data Variabel**
+| Fitur       | Jumlah                                     |
+|-------------|-----------------------------------------------|
+| `userId`   | 610                                  |
+| `movieId`     | 9724                                    |
+| `rating`    | 100,836  |
+
+**2. Distribusi Genre Film 🎬**
    ![Distribusi Genre](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/Genrefilm.png?raw=true)
    Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
 
-**2. Distribusi Rating Film ⭐**
+**3. Distribusi Rating Film ⭐**
   ![Distribusi Rating](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/ratingfilm.png?raw=true)
-Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan. Ini bisa menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
+Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan.Hal ini menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
 
 ## 4. 🛠️ Data Preparation
 
 ### ✅ Langkah-Langkah
-1. **Pivot Table:** Mengubah data rating ke bentuk matriks (userId x title).
-2. **Missing Values:** Diisi dengan 0 (asumsi belum dirating).
-3. **Encoding:** ID user dan judul film diubah ke indeks numerik.
-4. **Filtering:** Hanya menyertakan user & film dengan minimal 5 rating.
+1. **Menghapus label tidak valid:**  Label `(no genres listed)` pada kolom genre dihapus karena tidak memberikan informasi yang berguna untuk analisis.
+2. **Merge Data:** Menggabungkan dataset movies.csv dan ratings.csv berdasarkan kolom movieId untuk mengaitkan setiap film dengan rating  yang diberikan pengguna. Hasil penggabungan ini menghasilkan data frame dengan kolom `userId`, `movieId`, `rating`, `timestamp`, `title`, dan `genres`.
+3. **Pivot Table:** Data diubah menjadi format matriks dengan judul film (`title`) sebagai indeks dan ID pengguna (`userId`) sebagai kolom. 
+4. **Missing Values:** Karena tidak semua pengguna memberi rating pada semua film, maka akan muncul nilai NaN. Nilai tersebut diasumsikan sebagai belum dirating dan diisi dengan 0
+5. **Encoding:** Untuk keperluan pemodelan (terutama embedding), seperti pada Neural Collaborative Filtering (NCF) atau Matrix Factorization, baik `userId` maupun `movieId` perlu diubah menjadi representasi numerik berupa indeks integer mulai dari 0 hingga N-1.
+6. **Filtering:** Data disaring untuk menyertakan hanya film yang memiliki minimal 5 rating dari pengguna berbeda dan Pengguna yang memberikan minimal 5 rating ke film yang berbeda.
+Tujuannya adalah menjaga kualitas data agar fokus hanya pada entitas yang aktif dan relevan.
+
+Note : Fitur timestamp tidak digunakan dalam analisis karena tidak relevan terhadap tujuan pemodelan (content-based recommendation dan colaborative filtering).
 
 ### ⚙️ Alasan
-- Encoding diperlukan agar bisa digunakan dalam embedding model.
-- Filtering membantu fokus pada data yang informatif dan stabil.
+- Merge data bertujuan menyatukan informasi film dan interaksi pengguna ke dalam satu frame kerja analisis.
+- Pivot table dibutuhkan untuk mengubah data transaksional ke bentuk matriks interaksi user-item yang siap untuk digunakan dalam sistem rekomendasi.
+- Imputasi nilai kosong dengan 0 adalah pendekatan umum dalam explicit feedback dataset, mengasumsikan bahwa ketiadaan interaksi berarti ketidaktertarikan atau ketidaktahuan.
+- Encoding digunakan agar input yang sebelumnya kategorikal dapat diproses oleh model numerik, termasuk untuk embedding dan matrix factorization.
+- Filtering membantu mengurangi noise, mempercepat pelatihan model, dan meningkatkan kualitas rekomendasi dengan hanya mempertahankan entitas yang aktif dan informatif.
 
 ---
 
 ## 🤖 Modeling and Results
 
-### 1️⃣ Content-Based Filtering
-- Menggunakan TF-IDF Vectorizer pada kolom `genres`.
-- Menghitung cosine similarity antar film.
-- Output: Top-5 film yang paling mirip dengan input judul film.
+### 1️⃣ Content-Based Filtering (Genre-Based)
 
-#### Contoh Output : 🎬 Rekomendasi Film Mirip dengan "Antitrust (2001)"
+Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemiripan konten antar item. Dalam proyek ini, konten yang dimaksud adalah **genre film**, dan kemiripan antar film dihitung berdasarkan representasi numerik dari genre tersebut menggunakan teknik **TF-IDF (Term Frequency–Inverse Document Frequency)**.
+
+
+### 📌 Langkah-Langkah:
+
+1. **TF-IDF Vectorization:**
+   - Genre film dalam kolom `genres` diubah menjadi vektor numerik menggunakan `TfidfVectorizer`.
+   - Karena genre dipisahkan oleh simbol `|`, digunakan `token_pattern=r'[^|]+'` agar setiap genre dianggap sebagai satu token.
+   - Hasil akhir berupa matriks TF-IDF berukuran `(9708, 19)`—yang berarti terdapat 9708 film dan 19 genre unik.
+
+2. **Cosine Similarity:**
+   - Mengukur kemiripan antar film dengan menghitung **cosine similarity** antar vektor TF-IDF dari masing-masing film.
+   - Hasilnya berupa matriks kemiripan berukuran `(9708, 9708)`, di mana setiap nilai mencerminkan tingkat kemiripan antara dua film.
+
+3. **Rekomendasi Film:**
+   - Untuk setiap film input, diambil 5 film yang memiliki nilai cosine similarity tertinggi.
+   - Hasil rekomendasi diurutkan berdasarkan tingkat kemiripan, dan tidak termasuk film input itu sendiri.
+
+
+### 💡 Alasan Pemilihan Model:
+
+- Genre adalah informasi yang **tersedia untuk semua film**, sehingga cocok untuk cold-start item (film yang belum memiliki rating).
+- TF-IDF membantu menyeimbangkan genre umum (seperti *Drama*) dan genre yang lebih unik, sehingga rekomendasi lebih seimbang.
+- Cosine similarity efektif dalam mengukur kemiripan antar vektor dalam ruang berdimensi tinggi.
+
+#### Contoh Hasil Rekomendasi : 
+**🎬 Rekomendasi yang Film Mirip dengan "Antitrust (2001)"**
 | No | Title                                      | Genres                  |
 |----|--------------------------------------------|--------------------------|
 | 1  | Transsiberian (2008)                       | Crime\|Drama\|Thriller   |
@@ -92,17 +132,59 @@ Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating ya
 | 5  | Before the Devil Knows You're Dead         | Crime\|Drama\|Thriller   |
 
 
-
 ### 2️⃣ Collaborative Filtering
-- Dibuat dengan embedding layer untuk user dan film.
-- Model dikembangkan dengan TensorFlow/Keras.
-- Arsitektur mencakup:
-  - Embedding + Bias untuk user dan film.
-  - Dense Layer + Batch Normalization + Dropout.
-  - Output: prediksi rating antara 0 dan 1 (dalam skala ternormalisasi).
 
-#### Contoh Output : 🙋‍♂️ Top-10 Rekomendasi untuk Pengguna ID: 269
-#### 🎞️ Movie dengan Rating Tinggi oleh Pengguna
+Collaborative Filtering merupakan pendekatan berbasis interaksi antar pengguna (user) dan item (movie), tanpa memperhatikan konten eksplisit seperti genre. Pendekatan ini berupaya menemukan pola dari kesamaan preferensi antar pengguna untuk memberikan rekomendasi.
+
+#### ✅ Tahapan Pembangunan Model:
+
+1. **Transformasi dan Pembersihan Data**  
+   Dataset yang awalnya dalam format pivot (user vs movie rating) diubah menjadi format panjang (long format). Semua entri dengan rating nol dibuang karena dianggap sebagai ketidakterlibatan pengguna.
+
+2. **Filtering Data**  
+   Untuk meningkatkan kualitas rekomendasi dan efisiensi model, hanya pengguna dan film dengan minimal **5 interaksi** yang disertakan. Hal ini penting untuk menghindari cold-start dan memastikan model cukup data untuk belajar.
+
+3. **Encoding**  
+   User dan title diubah menjadi representasi numerik menggunakan teknik mapping (`user_to_user_encoded`, `movie_to_movie_encoded`) karena input model neural network harus berupa angka.
+
+4. **Normalisasi Rating**  
+   Nilai rating dinormalisasi ke rentang 0–1 untuk mempercepat dan menstabilkan proses pelatihan, khususnya ketika menggunakan fungsi aktivasi dan optimisasi berbasis gradien.
+
+5. **Pembagian Data**  
+   Data dibagi menjadi training dan validation set menggunakan **GroupShuffleSplit** berdasarkan `user`, untuk menghindari kebocoran informasi antar grup pengguna.
+
+
+#### 🧠 Arsitektur Model
+
+Model dikembangkan menggunakan TensorFlow dan Keras, serta memanfaatkan pendekatan **embedding-based neural network**. Detail arsitekturnya sebagai berikut:
+
+- **User & Movie Embedding Layer**  
+  Masing-masing user dan movie dipetakan ke dalam ruang vektor berdimensi tetap (default `embedding_size=50`) yang dilatih selama training.
+
+- **User & Movie Bias**  
+  Bias disertakan untuk memperhitungkan preferensi umum dari pengguna dan popularitas film tertentu.
+
+- **Hidden Layer**  
+  Representasi gabungan dari user dan movie embedding dilewatkan ke **Dense Layer**, kemudian diikuti oleh **Batch Normalization**, aktivasi ReLU, dan **Dropout** untuk regularisasi.
+
+- **Output Layer**  
+  Layer akhir adalah satu neuron yang memberikan prediksi rating dalam bentuk angka kontinu antara 0 dan 1, kemudian ditambahkan dengan bias pengguna dan film.
+
+
+#### ⚙️ Pelatihan Model
+
+- **Loss Function**: Mean Squared Error (MSE)  
+- **Optimizer**: Adam (learning rate = 0.001)  
+- **Early Stopping**: Diterapkan untuk mencegah overfitting dengan memantau `val_loss`.  
+- **Batch Size**: 64  
+- **Epochs**: Hingga 30, tetapi dapat berhenti lebih awal jika tidak ada peningkatan validasi.
+
+
+#### 🙋‍♂️ Contoh Hasil Rekomendasi: 
+
+**Top-10 Rekomendasi untuk Pengguna ID: 269**
+
+##### 🎞️ Film dengan Rating Tinggi oleh Pengguna
 | No | Judul                          | Genre                                  |
 |----|--------------------------------|----------------------------------------|
 | 1  | Heat (1995)                    | Action\|Crime\|Thriller                 |
@@ -111,46 +193,54 @@ Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating ya
 | 4  | Craft, The (1996)             | Drama\|Fantasy\|Horror\|Thriller       |
 | 5  | Leaving Las Vegas (1995)      | Drama\|Romance                         |
 
-#### 🏆 Top-10 Film Rekomendasi
-| No | Judul                                                                 | Genre                                       |
-|----|-----------------------------------------------------------------------|---------------------------------------------|
-| 1  | Lifeboat (1944)                                                      | Drama\|War                                  |
-| 2  | Persona (1966)                                                       | Drama                                       |
-| 3  | Guess Who's Coming to Dinner (1967)                                  | Drama                                       |
-| 4  | Captain Fantastic (2016)                                             | Drama                                       |
-| 5  | Trial, The (Procès, Le) (1962)                                       | Drama                                       |
-| 6  | Three Billboards Outside Ebbing, Missouri (2017)                     | Crime\|Drama                                |
-| 7  | Streetcar Named Desire, A (1951)                                     | Drama                                       |
-| 8  | Harold and Maude (1971)                                              | Comedy\|Drama\|Romance                      |
-| 9  | Day of the Doctor, The (2013)                                        | Adventure\|Drama\|Sci-Fi                    |
-| 10 | Neon Genesis Evangelion: The End of Evangelion (1997)               | Action\|Animation\|Drama\|Fantasy\|Sci-Fi   |
+##### 🏆 Top-10 Film Rekomendasi  
+| No | Judul                                                                                                 | Genre                                         |
+|----|-----------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| 1  | Lifeboat (1944)                                                                                      | Drama\|War                                    |
+| 2  | Persona (1966)                                                                                       | Drama                                         |
+| 3  | Shrek Forever After (a.k.a. Shrek: The Final Chapter) (2010)                                        | Adventure\|Animation\|Children\|Comedy\|Fantasy\|IMAX |
+| 4  | Guess Who's Coming to Dinner (1967)                                                                  | Drama                                         |
+| 5  | Trial, The (Procès, Le) (1962)                                                                       | Drama                                         |
+| 6  | Captain Fantastic (2016)                                                                             | Drama                                         |
+| 7  | Day of the Doctor, The (2013)                                                                        | Adventure\|Drama\|Sci-Fi                      |
+| 8  | Neon Genesis Evangelion: The End of Evangelion (Shin seiki Evangelion Gekijô-ban: Air/Magokoro wo, kimi ni) (1997) | Action\|Animation\|Drama\|Fantasy\|Sci-Fi     |
+| 9  | Man Bites Dog (C'est arrivé près de chez vous) (1992)                                               | Comedy\|Crime\|Drama\|Thriller                 |
+| 10 | Three Billboards Outside Ebbing, Missouri (2017)                                                    | Crime\|Drama                                  |
 
+🔚 Dengan pendekatan Collaborative Filtering berbasis deep learning ini, sistem rekomendasi mampu mengidentifikasi pola tersembunyi dari interaksi pengguna, bahkan untuk film yang sebelumnya belum pernah ditonton oleh pengguna yang bersangkutan.
 
+---
 
 ### ⚖️ Kelebihan & Kekurangan
 
-| Pendekatan             | Kelebihan                                        | Kekurangan                                      |
-|------------------------|--------------------------------------------------|--------------------------------------------------|
-| Content-Based Filtering | Tidak butuh data pengguna lain (cold start ok)  | Kurang variatif, hanya berdasarkan fitur film    |
-| Collaborative Filtering| Bisa deteksi pola tersembunyi antar pengguna     | Butuh banyak data historis, cold start problem   |
+| Pendekatan              | Kelebihan                                                                 | Kekurangan                                                                              |
+|-------------------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| Content-Based Filtering | - Tidak butuh data pengguna lain (cold start OK)                          <br> - Cocok untuk pengguna baru                                                           | - Rekomendasi cenderung monoton karena berbasis kemiripan konten                          <br> - Tidak belajar dari preferensi pengguna lain                                      |
+| Collaborative Filtering | - Dapat menemukan pola tersembunyi antar pengguna dan film               <br> - Lebih variatif karena hasil dipengaruhi interaksi banyak pengguna                  | - Membutuhkan banyak data rating historis                                               <br> - Tidak cocok untuk user/film baru tanpa interaksi (cold start problem)             |
 
 ---
 
 ## 5. 📈 Evaluation
 
 ### 📐 Metrik Evaluasi
-Kami menggunakan **Root Mean Squared Error (RMSE)** untuk collaborative filtering model.
+Kami menggunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi untuk model Collaborative Filtering berbasis Neural Network.
 
 #### Formula:
-RMSE = √(1/n * Σ(yᵢ - ŷᵢ)²)
-- RMSE rendah berarti prediksi model mendekati nilai sebenarnya.
+**RMSE = √(1/n × Σ(yᵢ - ŷᵢ)²)**
+- RMSE rendah mengindikasikan bahwa prediksi model mendekati nilai sebenarnya (semakin akurat).
 
 ### 📉 Evaluasi Performa Model Collaborative Filtering
-![Metrik Model](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/modelmetrics.png?raw=true)
-Visualisasi di atas menunjukkan performa model Collaborative Filtering berbasis Neural Network yang dievaluasi menggunakan metrik Root Mean Squared Error (RMSE).
-- Grafik menunjukkan tren penurunan nilai RMSE pada data pelatihan seiring bertambahnya epoch, yang berarti model semakin baik dalam memprediksi rating pengguna terhadap film seiring proses pelatihan.
-- Untuk data pengujian, RMSE juga menurun secara konsisten sampai sekitar epoch ke-4, kemudian mulai menunjukkan fluktuasi kecil. Hal ini menandakan bahwa model berhasil belajar dengan baik tanpa overfitting secara signifikan.
-- Nilai RMSE test yang tetap rendah mengindikasikan bahwa model memiliki generalisasi yang baik dalam merekomendasikan film kepada pengguna berdasarkan interaksi sebelumnya.
+
+![RMSE Grafik](attachment/fd563d88-b942-4686-b1bd-abcf294f10a6.png)
+
+Visualisasi di atas menunjukkan performa model pada data pelatihan dan pengujian selama 10 epoch:
+
+- **RMSE pada data pelatihan** menurun secara signifikan dari awal hingga sekitar epoch ke-4, lalu stabil di sekitar 0.19. Ini menunjukkan bahwa model mampu belajar representasi rating dengan baik.
+- **RMSE pada data pengujian** juga menurun hingga sekitar epoch ke-4, tetapi kemudian mengalami fluktuasi kecil. Meski begitu, nilainya tetap berada di kisaran rendah (sekitar 0.20), yang menunjukkan performa generalisasi yang cukup baik.
+- **Tidak terdapat indikasi overfitting signifikan**, karena selisih RMSE antara data pelatihan dan pengujian cukup kecil dan tidak menunjukkan lonjakan tajam.
+
+🟢 **Kesimpulan**: Model Collaborative Filtering yang digunakan dapat memberikan prediksi rating film yang cukup akurat dan stabil terhadap data baru.
+
 ---
 
 ## 6. ✅ Kesimpulan
