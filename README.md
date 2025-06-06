@@ -36,67 +36,130 @@ Kami mengimplementasikan dua pendekatan sistem rekomendasi:
 ## 3. 🧠 Data Understanding
 
 ### 📦 Dataset
-Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest Dataset](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset/data)
+Dataset yang digunakan berasal dari Kaggle dengan judul [Movie Lens Small Latest Dataset](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset/data). Dataset ini terdiri dari dua file utama, yaitu `movies.csv` dan `ratings.csv`.
 
-### 🔢 Jumlah & Struktur Data
-- **movies.csv:** 9,724 data film, dengan kolom `movieId`, `title`, dan `genres`.
-- **ratings.csv:** 100,836 data rating oleh pengguna, dengan kolom `userId`, `movieId`, `rating`, dan `timestamp`.
+---
 
-### 🔍 Fitur
-| Fitur       | Deskripsi                                     |
-|-------------|-----------------------------------------------|
-| `movieId`   | ID unik film                                  |
-| `title`     | Judul film                                    |
-| `genres`    | Genre film dalam format string (dipisah '|')  |
-| `userId`    | ID unik pengguna                              |
-| `rating`    | Nilai rating dari pengguna terhadap film      |
-| `timestamp` | Waktu saat pengguna memberikan rating         |
+### 📄 movies.csv
+
+- Jumlah baris: **9.742** 
+- Jumlah kolom: 3 (`movieId`, `title`, `genres`)
+- Deskripsi:
+  | Fitur     | Deskripsi                                             |
+  |-----------|-------------------------------------------------------|
+  | `movieId` | ID unik untuk setiap film                            |
+  | `title`   | Judul film, termasuk tahun rilis                     |
+  | `genres`  | Genre film, dipisahkan oleh simbol pipe `|`          |
+
+- Kondisi Data:
+  - Missing Values: Tidak ditemukan missing values.
+  - Duplikasi: Tidak ditemukan duplikasi berdasarkan `movieId`.
+  - Format genre: Terdapat 20 jenis genre film pada data. Namun, beberapa entri memiliki genre `'no genres listed'`, yang perlu ditangani saat data preparation.
+
+---
+
+### 📄 ratings.csv
+
+- Jumlah baris: **100.836**
+- Jumlah kolom: 4 (`userId`, `movieId`, `rating`, `timestamp`)
+- Deskripsi:
+  | Fitur       | Deskripsi                                                   |
+  |-------------|-------------------------------------------------------------|
+  | `userId`    | ID unik pengguna                                            |
+  | `movieId`   | ID film yang dirating oleh pengguna                         |
+  | `rating`    | Nilai rating dari pengguna terhadap film (skala 0.5–5.0)    |
+  | `timestamp` | Waktu saat pengguna memberikan rating (format UNIX epoch)   |
+
+- Kondisi Data:
+  - Missing Values: Tidak ditemukan missing values.
+  - Duplikasi: Tidak ditemukan duplikasi.
+  - Tidak ditemukan adanya outlier pada data rating.
 
 ### 📊 Exploratory Data Analysis
-**1. Jumlah Data Variabel**
-
-Jumlah data unique pada variabel yang digunakan dalam analisis sistem rekomendasi ini antara lain :
-| Fitur       | Jumlah                                     |
-|-------------|-----------------------------------------------|
-| `userId`   | 610                                  |
-| `movieId`     | 9724                                    |
-| `rating`    | 100,836  |
-
-Jumlah user adalah 610 dengan total jumlah film sebanyak 9724, dimiliki data rating sebanyak 100,836.
-
-**2. Distribusi Genre Film 🎬**
+**1. Distribusi Genre Film 🎬**
 
    ![Distribusi Genre](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/Genrefilm.png?raw=true)
    
    Genre yang paling mendominasi dalam dataset adalah Drama, diikuti oleh Comedy dan Thriller. Hal ini menunjukkan bahwa film dengan genre drama adalah yang paling sering diproduksi atau tersedia dalam data yang digunakan. Genre-genre seperti IMAX, Film-Noir, dan Western memiliki jumlah film yang jauh lebih sedikit, menunjukkan bahwa film dengan genre tersebut lebih jarang muncul. Distribusi ini dapat memengaruhi performa model, terutama pada sistem rekomendasi berbasis genre seperti content-based filtering, karena genre dominan akan lebih sering direkomendasikan.
 
-**3. Distribusi Rating Film ⭐**
+**2. Distribusi Rating Film ⭐**
 
   ![Distribusi Rating](https://github.com/gabriellayp/RecommedationSystem/blob/main/images/ratingfilm.png?raw=true)
   
-   Distribusi rating menunjukkan bahwa sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan.Hal ini menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
+   Distribusi rating menunjukkan bahwa tidak terdapat outlier, sebagian besar pengguna memberikan rating yang cukup tinggi terhadap film yang mereka tonton. Rating paling umum berada di angka 4.0, diikuti oleh 3.0 dan 5.0. Sebaliknya, rating rendah (seperti 0.5–1.5) jauh lebih jarang diberikan. Hal ini menunjukkan bahwa pengguna cenderung lebih sering menonton dan menilai film yang mereka sukai, atau film dengan kualitas yang relatif baik. Pola ini penting untuk diperhatikan karena bisa menciptakan bias pada model rekomendasi, terutama pada pendekatan collaborative filtering.
 
 ---
 
 ## 4. 🛠️ Data Preparation
 
-### ✅ Langkah-Langkah
-1. **Menghapus label tidak valid:**  Label `(no genres listed)` pada kolom genre dihapus karena tidak memberikan informasi yang berguna untuk analisis.
-2. **Merge Data:** Menggabungkan dataset movies.csv dan ratings.csv berdasarkan kolom movieId untuk mengaitkan setiap film dengan rating  yang diberikan pengguna. Hasil penggabungan ini menghasilkan data frame dengan kolom `userId`, `movieId`, `rating`, `timestamp`, `title`, dan `genres`.
-3. **Pivot Table:** Data diubah menjadi format matriks dengan judul film (`title`) sebagai indeks dan ID pengguna (`userId`) sebagai kolom. 
-4. **Missing Values:** Karena tidak semua pengguna memberi rating pada semua film, maka akan muncul nilai NaN. Nilai tersebut diasumsikan sebagai belum dirating dan diisi dengan 0
-5. **Filtering:** Data disaring untuk menyertakan hanya film yang memiliki minimal 5 rating dari pengguna berbeda dan Pengguna yang memberikan minimal 5 rating ke film yang berbeda.
-Tujuannya adalah menjaga kualitas data agar fokus hanya pada entitas yang aktif dan relevan.
-6. **Encoding:** Untuk keperluan pemodelan (terutama embedding), seperti pada Neural Collaborative Filtering (NCF) atau Matrix Factorization, baik `userId` maupun `movieId` perlu diubah menjadi representasi numerik berupa indeks integer mulai dari 0 hingga N-1.
+Data preparation dilakukan secara **terpisah** untuk dua pendekatan utama yang digunakan dalam sistem rekomendasi, yaitu **Content-Based Filtering** dan **Collaborative Filtering**. Masing-masing memiliki kebutuhan struktur dan praproses data yang berbeda. 
+
+Namun, sebelumnya dilakukan terlebih dahulu langkah untuk preparation keseluruhan data yang digunakan untuk kedua model yaitu :
+
+- **Menghapus label tidak valid:**  
+   Label `(no genres listed)` pada kolom `genres` dihapus karena tidak memberikan informasi yang berguna untuk analisis konten. Jumlah film setelah dibersihkan adalah 9708 film (sebelumnya dibersihkan jumlahnya 9742).
+
+
+### 📚 A. Content-Based Filtering
+
+Content-Based Filtering fokus pada fitur konten dari item (dalam hal ini: genre film) untuk merekomendasikan film yang mirip berdasarkan profil film itu sendiri.
+
+#### ✅ Langkah-Langkah
+**TF-IDF Vectorization:**
+   TF-IDF (Term Frequency - Inverse Document Frequency) adalah metode untuk mengubah teks menjadi representasi numerik dengan memberi bobot pada setiap kata berdasarkan seberapa sering kata tersebut muncul dalam dokumen tertentu (Term Frequency) dan seberapa unik kata tersebut dibandingkan seluruh dokumen (Inverse Document Frequency). Pada analisis ini, penerapannya antara lain :
+   - Kolom `genres` diubah menjadi representasi numerik menggunakan *TF-IDF Vectorizer*.
+   - Tokenisasi dilakukan berdasarkan separator `|` menggunakan `token_pattern=r'[^|]+'`, sehingga setiap genre dianggap sebagai token terpisah.
+   - Hasil akhir berupa matriks TF-IDF berukuran `(9708, 19)` — mewakili 9708 film dan 19 genre unik.
+
+#### ⚙️ Alasan
+- TF-IDF memberikan bobot proporsional terhadap genre yang lebih unik, menurunkan pengaruh genre populer yang terlalu sering muncul.
+- Matriks TF-IDF digunakan untuk menghitung *cosine similarity* antar film, yang menjadi dasar dalam sistem rekomendasi berbasis konten.
+
+---
+
+### 👥 B. Collaborative Filtering
+
+Collaborative Filtering memanfaatkan pola interaksi historis antara pengguna dan item (film) untuk membangun rekomendasi berdasarkan kesamaan preferensi.
+
+#### ✅ Langkah-Langkah
+1. **Merge Data:**  
+   Dataset `movies.csv` dan `ratings.csv` digabung berdasarkan `movieId` untuk mengaitkan setiap rating dengan informasi judul dan genre film.  
+   Hasil penggabungan berisi kolom `userId`, `movieId`, `rating`, `timestamp`, `title`, dan `genres`.
+
+2. **Pivot Table:**  
+   Data diubah menjadi matriks dengan `title` sebagai indeks dan `userId` sebagai kolom. Nilai cell menunjukkan rating dari pengguna untuk film tertentu.
+
+3. **Missing Values:**  
+   Karena tidak semua pengguna memberi rating untuk semua film, maka muncul nilai `NaN`. Nilai ini diisi dengan 0 yang merepresentasikan ketidakterlibatan (belum dirating).
+
+4. **Filtering:**  
+   Hanya menyertakan:
+   - Film yang dirating oleh minimal **5 pengguna**.
+   - Pengguna yang memberi rating ke minimal **5 film**.  
+   Tujuannya adalah untuk meningkatkan kualitas data dan memperkuat sinyal interaksi yang bermakna.
+
+5. **Encoding:**  
+   Kolom `userId` dan `movieId` diubah menjadi indeks integer mulai dari 0 (`user_encoded`, `movie_encoded`) untuk digunakan pada model machine learning berbasis embedding.
+
+6. **Normalisasi Rating:**  
+   Rating dengan skala asli 0.5–5 dinormalisasi ke dalam rentang 0–1 agar proses pelatihan model lebih stabil dan cepat konvergen.
+
+7. **Transformasi Format Long & Drop Rating 0:**  
+   - Matriks pivot dikembalikan ke format long (`userId`, `movieId`, `rating`).
+   - Interaksi dengan rating 0 dihapus karena dianggap sebagai non-interaksi yang tidak memberikan sinyal preferensi.
+
+8. **Pembagian Data:**  
+   Dataset dibagi menjadi **training set** dan **validation set** menggunakan teknik `GroupShuffleSplit` berdasarkan `userId` agar tidak ada informasi pengguna yang terbagi ke dua set.
+
+#### ⚙️ Alasan
+- Penggabungan dataset memastikan bahwa semua informasi user dan film tersedia dalam satu struktur kerja.
+- Pivot table mengubah data ke bentuk matriks interaksi user-item yang umum digunakan dalam sistem rekomendasi.
+- Imputasi nilai kosong dengan 0 merupakan pendekatan standar pada dataset dengan explicit feedback.
+- Encoding diperlukan untuk mengubah nilai kategorikal menjadi bentuk numerik yang dapat diproses model.
+- Filtering menjaga kualitas data dengan hanya melibatkan entitas yang aktif dan signifikan.
+- Pembagian data berdasarkan `userId` mencegah kebocoran informasi dan menjaga validitas evaluasi model.
 
 Note : Fitur timestamp tidak digunakan dalam analisis karena tidak relevan terhadap tujuan pemodelan (content-based recommendation dan colaborative filtering).
-
-### ⚙️ Alasan
-- Merge data bertujuan menyatukan informasi film dan interaksi pengguna ke dalam satu frame kerja analisis.
-- Pivot table dibutuhkan untuk mengubah data transaksional ke bentuk matriks interaksi user-item yang siap untuk digunakan dalam sistem rekomendasi.
-- Imputasi nilai kosong dengan 0 adalah pendekatan umum dalam explicit feedback dataset, mengasumsikan bahwa ketiadaan interaksi berarti ketidaktertarikan atau ketidaktahuan.
-- Encoding digunakan agar input yang sebelumnya kategorikal dapat diproses oleh model numerik, termasuk untuk embedding dan matrix factorization.
-- Filtering membantu mengurangi noise, mempercepat pelatihan model, dan meningkatkan kualitas rekomendasi dengan hanya mempertahankan entitas yang aktif dan informatif.
 
 ---
 
@@ -104,21 +167,15 @@ Note : Fitur timestamp tidak digunakan dalam analisis karena tidak relevan terha
 
 ### 1️⃣ Content-Based Filtering (Genre-Based)
 
-Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemiripan konten antar item. Dalam proyek ini, konten yang dimaksud adalah **genre film**, dan kemiripan antar film dihitung berdasarkan representasi numerik dari genre tersebut menggunakan teknik **TF-IDF (Term Frequency–Inverse Document Frequency)**.
-
+Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemiripan konten antar item. Dalam proyek ini, konten yang dimaksud adalah **genre film**, dan kemiripan antar film dihitung berdasarkan representasi numerik dari genre tersebut.
 
 ### 📌 Langkah-Langkah:
 
-1. **TF-IDF Vectorization:**
-   - Genre film dalam kolom `genres` diubah menjadi vektor numerik menggunakan `TfidfVectorizer`.
-   - Karena genre dipisahkan oleh simbol `|`, digunakan `token_pattern=r'[^|]+'` agar setiap genre dianggap sebagai satu token.
-   - Hasil akhir berupa matriks TF-IDF berukuran `(9708, 19)`—yang berarti terdapat 9708 film dan 19 genre unik.
-
-2. **Cosine Similarity:**
+1. **Menghitung Cosine Similarity:**
    - Mengukur kemiripan antar film dengan menghitung **cosine similarity** antar vektor TF-IDF dari masing-masing film.
    - Hasilnya berupa matriks kemiripan berukuran `(9708, 9708)`, di mana setiap nilai mencerminkan tingkat kemiripan antara dua film.
 
-3. **Rekomendasi Film:**
+2. **Rekomendasi Film:**
    - Untuk setiap film input, diambil 5 film yang memiliki nilai cosine similarity tertinggi.
    - Hasil rekomendasi diurutkan berdasarkan tingkat kemiripan, dan tidak termasuk film input itu sendiri.
 
@@ -130,7 +187,7 @@ Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemirip
 - Cosine similarity efektif dalam mengukur kemiripan antar vektor dalam ruang berdimensi tinggi.
 
 #### Contoh Hasil Rekomendasi : 
-**🎬 Rekomendasi yang Film Mirip dengan "Antitrust (2001)"**
+**🎬 Rekomendasi yang Film Mirip dengan "Antitrust (2001)" dengan genre Crime|Drama|Thriller**
 | No | Title                                      | Genres                  |
 |----|--------------------------------------------|--------------------------|
 | 1  | Transsiberian (2008)                       | Crime\|Drama\|Thriller   |
@@ -144,24 +201,6 @@ Dari hasil rekomendasi di atas, terlihat bahwa rekomendasi film yang mirip denga
 ### 2️⃣ Collaborative Filtering
 
 Collaborative Filtering merupakan pendekatan berbasis interaksi antar pengguna (user) dan item (movie), tanpa memperhatikan konten eksplisit seperti genre. Pendekatan ini berupaya menemukan pola dari kesamaan preferensi antar pengguna untuk memberikan rekomendasi.
-
-#### ✅ Tahapan Pembangunan Model:
-
-1. **Transformasi dan Pembersihan Data**  
-   Dataset yang awalnya dalam format pivot (user vs movie rating) diubah menjadi format panjang (long format). Semua entri dengan rating nol dibuang karena dianggap sebagai ketidakterlibatan pengguna.
-
-2. **Filtering Data**  
-   Untuk meningkatkan kualitas rekomendasi dan efisiensi model, hanya pengguna dan film dengan minimal **5 interaksi** yang disertakan. Hal ini penting untuk menghindari cold-start dan memastikan model cukup data untuk belajar.
-
-3. **Encoding**  
-   User dan title diubah menjadi representasi numerik menggunakan teknik mapping (`user_to_user_encoded`, `movie_to_movie_encoded`) karena input model neural network harus berupa angka.
-
-4. **Normalisasi Rating**  
-   Nilai rating dinormalisasi ke rentang 0–1 untuk mempercepat dan menstabilkan proses pelatihan, khususnya ketika menggunakan fungsi aktivasi dan optimisasi berbasis gradien.
-
-5. **Pembagian Data**  
-   Data dibagi menjadi training dan validation set menggunakan **GroupShuffleSplit** berdasarkan `user`, untuk menghindari kebocoran informasi antar grup pengguna.
-
 
 #### 🧠 Arsitektur Model
 
@@ -239,8 +278,23 @@ Dari output diatas, User 269 tampaknya menyukai film dengan genre Drama dan Roma
 
 ## 5. 📈 Evaluation
 
-### 📐 Metrik Evaluasi
-Kami menggunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi untuk model Collaborative Filtering berbasis Neural Network.
+### 📐Metrik Evaluasi Content-Based-Filtering
+Evaluasi dilakukan menggunakan metrik **Precision**, yang mengukur seberapa banyak dari hasil rekomendasi yang benar-benar relevan.
+
+#### Rumus Precision:
+Precision = (Jumlah item relevan yang direkomendasikan) / (Jumlah total item yang direkomendasikan)
+
+Dalam kasus ini, definisi **relevan** adalah film yang memiliki **minimal satu genre yang sama** dengan film input (*Antitrust (2001)*). Genre film target adalah: `Crime | Drama | Thriller`.
+
+Maka, Precision = 5 / 5 = 1.00
+
+
+✅ **Hasil Precision: 1.00 (100%)**  
+Artinya, semua film yang direkomendasikan memiliki genre yang relevan dengan film target. Model berhasil memberikan hasil rekomendasi yang sangat relevan secara konten.
+
+
+### 📐 Metrik Evaluasi Collaborative Filtering
+Digunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi untuk model Collaborative Filtering berbasis Neural Network.
 
 #### Formula:
 **RMSE = √(1/n × Σ(yᵢ - ŷᵢ)²)**
