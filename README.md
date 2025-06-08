@@ -132,21 +132,21 @@ Collaborative Filtering memanfaatkan pola interaksi historis antara pengguna dan
 3. **Missing Values:**  
    Karena tidak semua pengguna memberi rating untuk semua film, maka muncul nilai `NaN`. Nilai ini diisi dengan 0 yang merepresentasikan ketidakterlibatan (belum dirating).
 
-4. **Filtering:**  
+4. **Transformasi Format Long & Drop Rating 0:**  
+   - Matriks pivot dikembalikan ke format long (`userId`, `movieId`, `rating`).
+   - Interaksi dengan rating 0 dihapus karena dianggap sebagai non-interaksi yang tidak memberikan sinyal preferensi.
+
+5. **Filtering:**  
    Hanya menyertakan:
    - Film yang dirating oleh minimal **5 pengguna**.
    - Pengguna yang memberi rating ke minimal **5 film**.  
    Tujuannya adalah untuk meningkatkan kualitas data dan memperkuat sinyal interaksi yang bermakna.
 
-5. **Encoding:**  
+6. **Encoding:**  
    Kolom `userId` dan `movieId` diubah menjadi indeks integer mulai dari 0 (`user_encoded`, `movie_encoded`) untuk digunakan pada model machine learning berbasis embedding.
 
-6. **Normalisasi Rating:**  
+7. **Normalisasi Rating:**  
    Rating dengan skala asli 0.5–5 dinormalisasi ke dalam rentang 0–1 agar proses pelatihan model lebih stabil dan cepat konvergen.
-
-7. **Transformasi Format Long & Drop Rating 0:**  
-   - Matriks pivot dikembalikan ke format long (`userId`, `movieId`, `rating`).
-   - Interaksi dengan rating 0 dihapus karena dianggap sebagai non-interaksi yang tidak memberikan sinyal preferensi.
 
 8. **Pembagian Data:**  
    Dataset dibagi menjadi **training set** dan **validation set** menggunakan teknik `GroupShuffleSplit` berdasarkan `userId` agar tidak ada informasi pengguna yang terbagi ke dua set.
@@ -194,7 +194,7 @@ Content-Based Filtering adalah pendekatan rekomendasi yang berfokus pada kemirip
 | 2  | Presumed Innocent (1990)                   | Crime\|Drama\|Thriller   |
 | 3  | Out of Time (2003)                         | Crime\|Drama\|Thriller   |
 | 4  | Taking of Pelham 1 2 3, The (2009)         | Crime\|Drama\|Thriller   |
-| 5  | Before the Devil Knows You're Dead         | Crime\|Drama\|Thriller   |
+| 5  | Before the Devil Knows You're Dead (2007)        | Crime\|Drama\|Thriller   |
 
 Dari hasil rekomendasi di atas, terlihat bahwa rekomendasi film yang mirip dengan dengan Antitrust (2001) merupakan film yang genrenya Crime, Drama dan Thriller.
 
